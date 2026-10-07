@@ -1,3 +1,6 @@
+
+import "./App.css";
+
 import Counter from "./components/Counter";
 import Car from "./components/Car";
 import Drinks from "./components/Drinks";

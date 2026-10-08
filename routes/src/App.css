@@ -1,0 +1,233 @@
+
+/* 전체 기본 스타일 */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fff0f5, #ffe4ee, #fff8fb);
+  font-family: 'Arial', sans-serif;
+  color: #744b61;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* 상단 메뉴 */
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 20px rgba(236, 132, 170, 0.12);
+}
+
+.header a,
+.header .logout-btn {
+  color: #b96b8c;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.header a:hover,
+.header .logout-btn:hover {
+  background: #ffe0eb;
+  color: #d94f88;
+  transform: translateY(-2px);
+}
+
+/* 로그인 & 회원가입 카드 */
+.login,
+.signup {
+  width: 90%;
+  max-width: 420px;
+  margin: 80px auto;
+  padding: 45px 38px;
+  background: #ffffff;
+  border: 1px solid #ffe0ec;
+  border-radius: 25px;
+  box-shadow: 0 15px 45px rgba(226, 112, 154, 0.15);
+  animation: fadeIn 0.5s ease;
+}
+
+.login h2,
+.signup h2 {
+  text-align: center;
+  color: #d65c91;
+  font-size: 28px;
+  margin: 0 0 30px;
+}
+
+.login h4,
+.signup h4 {
+  text-align: center;
+  color: #E84A87;
+  font-size: 17px;
+  margin: 0 0 30px;
+}
+
+/* 입력 폼 */
+.login form,
+.signup form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login form p,
+.signup form p {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #98657c;
+}
+
+.login input,
+.signup input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid #f6cfdf;
+  border-radius: 12px;
+  background: #fffafd;
+  color: #744b61;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.25s;
+}
+
+.login input:focus,
+.signup input:focus {
+  border-color: #ed91b4;
+  box-shadow: 0 0 0 4px rgba(237, 145, 180, 0.15);
+}
+
+.login input::placeholder,
+.signup input::placeholder {
+  color: #c7a8b7;
+}
+
+/* 로그인 & 회원가입 버튼 */
+.login button,
+.signup button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #f4a1c0, #e878a3);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(232, 120, 163, 0.25);
+  transition: all 0.3s ease;
+}
+
+.login button:hover,
+.signup button:hover {
+  background: linear-gradient(135deg, #ee8fb3, #dc6294);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(232, 120, 163, 0.3);
+}
+
+/* 로그인 실패 메시지 */
+.login form .error-message {
+  display: block;
+  color: #e53955;
+  background: #fff0f2;
+  border: 1px solid #ffc6d1;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* 홈 화면 */
+.home {
+  text-align: center;
+  max-width: 650px;
+  margin: 60px auto;
+  padding: 35px;
+  background: white;
+  border-radius: 25px;
+  box-shadow: 0 12px 35px rgba(226, 112, 154, 0.12);
+}
+
+.home h1 {
+  color: #d65c91;
+  font-size: 30px;
+}
+
+.home p {
+  color: #b47d98;
+  font-size: 17px;
+}
+
+/* 치이카와 이미지 */
+.chiikawa-img {
+  display: block;
+  width: 320px;
+  max-width: 100%;
+  height: auto;
+  margin: 25px auto 0;
+  border-radius: 18px;
+  transition: transform 0.3s ease;
+}
+
+.chiikawa-img:hover {
+  transform: scale(1.05);
+}
+
+/* 등장 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 모바일 화면 */
+@media (max-width: 480px) {
+  .header {
+    gap: 5px;
+    padding: 15px 5px;
+  }
+
+  .login,
+  .signup {
+    margin: 40px auto;
+    padding: 30px 22px;
+  }
+
+  .home {
+    margin: 30px 15px;
+  }
+}
+
+.chiikawa-img {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.chiikawa-img:hover {
+  transform: scale(1.05);
+}

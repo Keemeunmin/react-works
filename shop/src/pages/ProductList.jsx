@@ -1,4 +1,4 @@
-import products from '../data/products'
+import products from '../data/Products.jsx'
 import { Link } from 'react-router-dom'
 
 const ProductList = () => {

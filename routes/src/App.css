@@ -231,3 +231,27 @@ body {
 .chiikawa-img:hover {
   transform: scale(1.05);
 }
+
+.board-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.board-list a {
+  display: block;
+  padding: 16px;
+  background-color: #fff0f5;
+  border: 1px solid #f8c8dc;
+  border-radius: 12px;
+  color: #c83f75;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.board-list a:hover {
+  background-color: #ffd9e8;
+  transform: translateY(-3px);
+}

@@ -1,0 +1,82 @@
+/* 전체 레이아웃 */
+#root {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+/* 메인 제목 */
+h1 {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 40px;
+}
+
+/* 할 일 목록 컨테이너 */
+h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #2563eb;
+}
+
+/* 목록 */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 할 일 카드 */
+li {
+  background-color: #ffffff;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  font-size: 16px;
+  color: #374151;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+}
+
+/* 마우스를 올렸을 때 */
+li:hover {
+  transform: translateY(-3px);
+  border-color: #93c5fd;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
+}
+
+/* 로딩 및 오류 메시지 */
+p {
+  text-align: center;
+  font-size: 16px;
+  padding: 20px;
+  color: #6b7280;
+}
+
+/* 모바일 화면 */
+@media (max-width: 600px) {
+  #root {
+    padding: 20px 15px;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  li {
+    padding: 15px;
+    font-size: 14px;
+  }
+}

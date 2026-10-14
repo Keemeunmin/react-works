@@ -80,3 +80,86 @@ p {
     font-size: 14px;
   }
 }
+
+.app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.app-nav a {
+  padding: 12px 18px;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.app-nav a:hover {
+  background-color: #1d4ed8;
+}
+
+.axios-todos li {
+  margin: 10px 0;
+}
+
+.axios-todo-by-id p {
+  line-height: 2;
+  text-align: left;
+}
+
+.axios-new-todo form {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.axios-new-todo input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.axios-new-todo button {
+  padding: 12px 20px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+
+.axios-new-todo ul {
+  list-style: none;
+  padding: 0;
+}
+
+.axios-new-todo li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.axios-new-todo li span {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.axios-new-todo li button {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+}

@@ -1,0 +1,288 @@
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.header {
+  background-color: #263b59;
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0 0 10px;
+}
+
+.header p {
+  margin: 0;
+  color: #dce5f1;
+}
+
+.navigation {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.navigation a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 18px;
+  border: 1px solid #8fa4c1;
+  border-radius: 6px;
+}
+
+.navigation a:hover {
+  background-color: #405b7e;
+}
+
+.product-container,
+.detail-container,
+.form-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.product-table,
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.product-table th,
+.product-table td,
+.detail-table th,
+.detail-table td {
+  border: 1px solid #ddd;
+  padding: 14px;
+  text-align: center;
+}
+
+.product-table th {
+  background-color: #eef2f7;
+}
+
+.product-table tbody tr:hover {
+  background-color: #f7f9fc;
+}
+
+.product-link {
+  color: #2456a6;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.product-link:hover {
+  text-decoration: underline;
+}
+
+.detail-table th {
+  width: 180px;
+  background-color: #eef2f7;
+}
+
+.detail-table td {
+  text-align: left;
+}
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 700px;
+}
+
+.product-form label {
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.product-form input,
+.product-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.product-form input:focus,
+.product-form textarea:focus {
+  outline: 2px solid #8ba7d1;
+  border-color: #527bb3;
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 20px;
+  background-color: #263b59;
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+  text-align: center;
+}
+
+.btn:hover {
+  background-color: #405b7e;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: #777;
+}
+
+.btn-secondary:hover {
+  background-color: #555;
+}
+
+.btn-danger {
+  background-color: #c0392b;
+}
+
+.btn-danger:hover {
+  background-color: #962d22;
+}
+
+.error {
+  color: #c0392b;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .product-container,
+  .detail-container,
+  .form-container {
+    margin: 20px auto;
+    padding: 12px;
+  }
+
+  .product-table th,
+  .product-table td {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* 상품 검색 및 정렬 */
+.search-container {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0 16px;
+}
+
+.search-container input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.search-container select {
+  width: 210px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  font: inherit;
+}
+
+.search-container input:focus,
+.search-container select:focus {
+  outline: 2px solid #8ba7d1;
+  border-color: #527bb3;
+}
+
+@media (max-width: 600px) {
+  .search-container {
+    flex-direction: column;
+  }
+
+  .search-container select {
+    width: 100%;
+  }
+}
+
+
+/* ===========================
+   상품 목록 페이징
+=========================== */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.pagination button {
+  min-width: 40px;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #eef2f7;
+}
+
+.pagination button.active {
+  background-color: #263b59;
+  color: white;
+  border-color: #263b59;
+  font-weight: bold;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-info {
+  margin-top: 15px;
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+}

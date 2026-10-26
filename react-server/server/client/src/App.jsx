@@ -5,10 +5,29 @@ import ProductList from './products/ProductList';
 import AddProduct from './products/AddProduct';
 import ProductInfo from './products/ProductInfo';
 import UpdateProduct from './products/UpdateProduct';
+import SignUp from "./members/SignUp";
+import { useState } from "react";
+import SignIn from "./members/SignIn";
 
 import './App.css';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [userRole, setUserRole] = useState("");
+  
+  const handleLogin = (username, role) => {
+  setIsLoggedIn(true);
+  setUsername(username);
+  setUserRole(role);
+};
+
+  const handleLogout = () => {
+  setIsLoggedIn(false);
+  setUsername("");
+  setUserRole("");
+};
+
   return (
     <BrowserRouter>
       <div className="app">
@@ -45,6 +64,14 @@ function App() {
               path="*"
               element={<h2>페이지를 찾을 수 없습니다.</h2>}
             />
+
+            <Route path="/signup" element={<SignUp />} />
+
+            <Route
+            path="/signin"
+            element={<SignIn onLogin={handleLogin} />}
+            />
+
           </Routes>
         </main>
       </div>

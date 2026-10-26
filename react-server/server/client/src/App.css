@@ -286,3 +286,83 @@
   color: #777;
   font-size: 14px;
 }
+
+/* 회원가입 */
+.sign-up {
+  text-align: center;
+  padding: 30px;
+}
+
+.sign-up form {
+  width: 40%;
+  min-width: 280px;
+  margin: 20px auto;
+  text-align: left;
+}
+
+.sign-up form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.sign-up form input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+}
+
+.sign-up form button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.sign-up form button[type="submit"] {
+  background-color: #2424fe;
+  color: white;
+}
+
+.sign-up form button[type="button"] {
+  background-color: #a3a5a2;
+  color: white;
+}
+
+/* 로그인 화면 */
+.sign-in {
+  text-align: center;
+  padding: 30px;
+}
+
+.sign-in form {
+  width: 30%;
+  min-width: 280px;
+  margin: 20px auto;
+  text-align: left;
+}
+
+.sign-in form input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+}
+
+.sign-in form button {
+  width: 100%;
+  padding: 10px;
+  background-color: #30ca11;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.sign-in form button:hover {
+  background-color: #1e9813;
+}

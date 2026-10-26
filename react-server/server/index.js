@@ -2,6 +2,7 @@
 import express from 'express';
 import mysql from 'mysql2';
 import cors from 'cors';
+import bcrypt from 'bcryptjs';
 
 const app = express();
 const PORT = 8000;
@@ -210,8 +211,157 @@ app.delete('/api/products/:id', (req, res) => {
   });
 });
 
-// 11. 서버 실행
+// ========================================
+// 11. 회원 API
+// ========================================
+
+// 11-1. 회원 목록 조회
+app.get('/api/users', (req, res) => {
+  const sql = `
+    SELECT id, username, email, role, created_at
+    FROM users
+    ORDER BY id ASC
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('회원 목록 조회 에러:', err);
+      return res.status(500).send('회원 조회 중 오류가 발생했습니다.');
+    }
+
+    res.json(results);
+  });
+});
+
+
+// 회원가입
+app.post('/api/users', async (req, res) => {
+  const { username, password, email } = req.body;
+
+  if (!username?.trim() || !password || !email?.trim()) {
+    return res.status(400).send('모든 항목을 입력하세요.');
+  }
+
+  try {
+    // 비밀번호 암호화(해시)
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const sql = `
+      INSERT INTO users (username, password, email)
+      VALUES (?, ?, ?)
+    `;
+
+    db.query(
+      sql,
+      [username.trim(), hashedPassword, email.trim()],
+      (err, results) => {
+        if (err) {
+          console.error('회원가입 에러:', err);
+
+          if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).send('이미 존재하는 아이디입니다.');
+          }
+
+          return res.status(500).send('회원가입 실패');
+        }
+
+        res.status(201).json({
+          message: '회원가입이 완료되었습니다.',
+          id: results.insertId
+        });
+      }
+    );
+  } catch (error) {
+    console.error('비밀번호 처리 에러:', error);
+    res.status(500).send('회원가입 실패');
+  }
+});
+
+
+// 11-3. 회원 상세 조회
+app.get('/api/users/:username', (req, res) => {
+  const username = req.params.username;
+
+  const sql = `
+    SELECT id, username, email, role, created_at
+    FROM users
+    WHERE username = ?
+  `;
+
+  db.query(sql, [username], (err, results) => {
+    if (err) {
+      console.error('회원 상세 조회 에러:', err);
+      return res.status(500).send('회원 조회 중 오류가 발생했습니다.');
+    }
+
+    if (results.length === 0) {
+      return res.status(404).send('존재하지 않는 회원입니다.');
+    }
+
+    res.json(results[0]);
+  });
+});
+
+// 로그인
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({
+      message: '아이디와 비밀번호를 입력하세요.'
+    });
+  }
+
+  const sql = `
+    SELECT id, username, password, role
+    FROM users
+    WHERE username = ?
+  `;
+
+  db.query(sql, [username], async (err, results) => {
+    if (err) {
+      console.error('로그인 오류:', err);
+      return res.status(500).json({
+        message: '로그인 처리 중 오류가 발생했습니다.'
+      });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({
+        message: '아이디 또는 비밀번호가 일치하지 않습니다.'
+      });
+    }
+
+    const user = results[0];
+
+    try {
+      const isMatch = await bcrypt.compare(password, user.password);
+
+      if (!isMatch) {
+        return res.status(401).json({
+          message: '아이디 또는 비밀번호가 일치하지 않습니다.'
+        });
+      }
+
+      res.json({
+        message: '로그인 성공',
+        username: user.username,
+        role: user.role
+      });
+    } catch (error) {
+      console.error('비밀번호 검증 오류:', error);
+      res.status(500).json({
+        message: '로그인 처리 중 오류가 발생했습니다.'
+      });
+    }
+  });
+});
+
+
+// ========================================
+// 12. 서버 실행
+// ========================================
+
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}에서 서버 실행중...`);
 });
-

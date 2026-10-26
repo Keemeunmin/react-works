@@ -1,32 +1,34 @@
 
 import express from 'express';
-import mysql from 'mysql2/promise';
+import pg from 'pg';
+import 'dotenv/config';
+
+const { Pool } = pg;
 
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 // ========================================
 // 1. 미들웨어 설정
 // ========================================
 
-// JSON 데이터 처리
 app.use(express.json());
 
-// 요청 로그 출력
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
 
 // ========================================
-// 2. MySQL 연결 설정
+// 2. PostgreSQL 연결 설정
 // ========================================
 
-const db = mysql.createPool({
-  host: 'localhost',
-  user: 'jsuser',
-  password: 'pwjs',
-  database: 'jsdb'
+const db = new Pool({
+  host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT || 5432),
+  user: process.env.DB_USER || 'jsuser',
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME || 'jsdb'
 });
 
 // ========================================
@@ -34,7 +36,7 @@ const db = mysql.createPool({
 // ========================================
 
 app.get('/', (req, res) => {
-  res.send('<h2>Hello Express + MySQL</h2>');
+  res.send('<h2>Hello Express + PostgreSQL</h2>');
 });
 
 // ========================================
@@ -43,11 +45,13 @@ app.get('/', (req, res) => {
 
 app.get('/api/products', async (req, res) => {
   try {
-    const [rows] = await db.query(
-      'SELECT id, product_name AS name, price, created_at FROM product'
+    const result = await db.query(
+      `SELECT id, product_name AS name, price, created_at
+       FROM product
+       ORDER BY id ASC`
     );
 
-    res.status(200).json(rows);
+    res.status(200).json(result.rows);
 
   } catch (err) {
     console.error('상품 조회 오류:', err);
@@ -72,19 +76,20 @@ app.get('/api/products/:id', async (req, res) => {
       });
     }
 
-    const [rows] = await db.execute(
+    const result = await db.query(
       `SELECT id, product_name AS name, price, created_at
-       FROM product WHERE id = ?`,
+       FROM product
+       WHERE id = $1`,
       [id]
     );
 
-    if (rows.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(404).json({
         message: '상품을 찾을 수 없습니다.'
       });
     }
 
-    res.status(200).json(rows[0]);
+    res.status(200).json(result.rows[0]);
 
   } catch (err) {
     console.error('상품 상세 조회 오류:', err);
@@ -106,7 +111,7 @@ app.post('/api/products', async (req, res) => {
     if (
       typeof name !== 'string' ||
       !name.trim() ||
-      name.length > 20 ||
+      name.length > 100 ||
       typeof price !== 'number' ||
       !Number.isSafeInteger(price) ||
       price < 0 ||
@@ -117,15 +122,17 @@ app.post('/api/products', async (req, res) => {
       });
     }
 
-    const [result] = await db.execute(
-      'INSERT INTO product (product_name, price) VALUES (?, ?)',
+    const result = await db.query(
+      `INSERT INTO product (product_name, price)
+       VALUES ($1, $2)
+       RETURNING id`,
       [name.trim(), price]
     );
 
     res.status(201).json({
       message: '상품이 등록되었습니다.',
       product: {
-        id: result.insertId,
+        id: result.rows[0].id,
         name: name.trim(),
         price
       }
@@ -158,7 +165,7 @@ app.put('/api/products/:id', async (req, res) => {
     if (
       typeof name !== 'string' ||
       !name.trim() ||
-      name.length > 20 ||
+      name.length > 100 ||
       typeof price !== 'number' ||
       !Number.isSafeInteger(price) ||
       price < 0 ||
@@ -169,14 +176,14 @@ app.put('/api/products/:id', async (req, res) => {
       });
     }
 
-    const [result] = await db.execute(
+    const result = await db.query(
       `UPDATE product
-       SET product_name = ?, price = ?
-       WHERE id = ?`,
+       SET product_name = $1, price = $2
+       WHERE id = $3`,
       [name.trim(), price, id]
     );
 
-    if (result.affectedRows === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({
         message: '상품을 찾을 수 없습니다.'
       });
@@ -214,12 +221,12 @@ app.delete('/api/products/:id', async (req, res) => {
       });
     }
 
-    const [result] = await db.execute(
-      'DELETE FROM product WHERE id = ?',
+    const result = await db.query(
+      'DELETE FROM product WHERE id = $1',
       [id]
     );
 
-    if (result.affectedRows === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({
         message: '상품을 찾을 수 없습니다.'
       });
@@ -240,13 +247,13 @@ app.delete('/api/products/:id', async (req, res) => {
 });
 
 // ========================================
-// 9. MySQL 연결 확인 및 서버 실행
+// 9. PostgreSQL 연결 확인 및 서버 실행
 // ========================================
 
 try {
-  const connection = await db.getConnection();
+  const connection = await db.connect();
 
-  console.log('MySQL에 연결되었습니다.');
+  console.log('PostgreSQL에 연결되었습니다.');
   connection.release();
 
   app.listen(PORT, () => {
@@ -256,7 +263,8 @@ try {
   });
 
 } catch (err) {
-  console.error('MySQL 연결 실패:', err.message);
+  console.error('PostgreSQL 연결 실패:', err.message);
   process.exitCode = 1;
   await db.end();
 }
+

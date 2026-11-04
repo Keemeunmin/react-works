@@ -8,7 +8,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const { addToCart } = useCart();
+  const { addToCart } = useCart()
 
   return (
     <div className="card">

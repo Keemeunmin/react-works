@@ -1,51 +1,94 @@
 
-import { Link, useParams } from "react-router-dom";
-import { useProduct } from "../context/ProductContext";
-import { useCart } from "../context/CartContext";
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { getProductById } from '../api/products';
+import { useCart } from '../context/CartContext';
+import type { Product } from '../types/product';
 
-const ProductDetail = () => {
-  const { id } = useParams<{ id: string }>();
-  const { products } = useProduct();
+export default function ProductDetail() {
+  const { id } = useParams();
   const { addToCart } = useCart();
 
-  const product = products.find(
-    (p) => p.id === Number(id)
-  );
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  if (!product) {
-    return <div>상품을 찾을 수 없습니다.</div>;
+  useEffect(() => {
+  const loadProduct = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      const data = await getProductById(Number(id));
+      setProduct(data ?? null);
+
+    } catch (err) {
+      console.error(err);
+      setError('상품 정보를 불러오지 못했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (id) {
+    loadProduct();
+  } else {
+    setLoading(false);
+    setError('상품 번호가 없습니다.');
+  }
+}, [id]);
+
+  const handleAddToCart = () => {
+    if (!product) return;
+
+    addToCart(product);
+    alert('장바구니에 상품을 담았습니다!');
+  };
+
+  if (loading) {
+    return <p>상품 정보를 불러오는 중...</p>;
+  }
+
+  if (error || !product) {
+    return <p>{error || '상품을 찾을 수 없습니다.'}</p>;
   }
 
   return (
-    <article className="product-detail">
-      <Link to="/">← 상품 목록</Link>
+    <div className="product-detail">
+      <h2>상품 상세 정보</h2>
 
-      <span className="product-detail_category">
-        {product.category}
-      </span>
+      {product.imageUrl && (
+        <img
+          src={product.imageUrl}
+          alt={product.pName}
+          className="product-detail-image"
+        />
+      )}
 
-      <h2>{product.pName}</h2>
+      <h3>{product.pName}</h3>
 
-      <p className="product-detail_price">
-        {product.price.toLocaleString()}원
-      </p>
+      <p>카테고리: {product.category}</p>
 
-      <p className="product-detail_desc">
-        {product.description}
-      </p>
+      <p>가격: {product.price.toLocaleString()}원</p>
+
+      <p>설명: {product.description}</p>
 
       <button
         type="button"
-        className="product-detail_cart"
-        onClick={() => {
-          addToCart(product.id, 1);
-          alert(`${product.pName} 상품이 장바구니에 담겼습니다.`);
-        }}
+        onClick={handleAddToCart}
+        className="add-cart-btn"
       >
-        장바구니
+        장바구니 담기
       </button>
-    </article>
-  );
-};
 
-export default ProductDetail;
+      <div>
+        <Link to="/cart">장바구니 보기</Link>
+      </div>
+
+      <div>
+        <Link to="/">상품 목록으로 돌아가기</Link>
+      </div>
+    </div>
+  );
+}
+

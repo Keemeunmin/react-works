@@ -1,46 +1,27 @@
 
-import React, { useState } from "react";
-import type { Product, NewProduct } from "../types/product";
-import { initialProducts } from "../datas/products";
-import { ProductContext } from "./ProductContext";
+import { useEffect, useState, type ReactNode } from 'react';
+import { ProductContext } from './ProductContext';
+import { createProduct, getProducts } from '../api/products';
+import type { NewProduct, Product } from '../types/product';
 
-const ProductProvider = ({ children }: { children: React.ReactNode }) => {
+const ProductProvider = ({ children }: { children: ReactNode }) => {
+  const [products, setProducts] = useState<Product[]>([]);
 
-  // 상품 상태 관리
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  // 처음 화면이 나타날 때 DB에서 상품 목록 가져오기
+  useEffect(() => {
+    getProducts()
+      .then(setProducts)
+      .catch((err) => console.log('상품 목록 조회 오류!', err));
+  }, []);
 
-  // 상품 추가 함수
-  const addProduct = (newProduct: NewProduct) => {
-    const product: Product = {
-      ...newProduct,
-      id: Date.now()
-    };
-
-    setProducts([...products, product]);
-  };
-
-  // 상품 삭제 함수
-  const removeProduct = (productId: number) => {
-    setProducts(
-      products.filter((product) => product.id !== productId)
-    );
-  };
-
-  // 상품 수정 함수
-  const updateProduct = (updatedProduct: Product) => {
-    setProducts(
-      products.map((product) =>
-        product.id === updatedProduct.id
-          ? updatedProduct
-          : product
-      )
-    );
+  // 상품을 DB에 저장한 후 목록 다시 가져오기
+  const addProduct = async (product: NewProduct) => {
+    await createProduct(product);
+    setProducts(await getProducts());
   };
 
   return (
-    <ProductContext.Provider
-      value={{ products, addProduct, removeProduct, updateProduct }}
-    >
+    <ProductContext.Provider value={{ products, addProduct }}>
       {children}
     </ProductContext.Provider>
   );

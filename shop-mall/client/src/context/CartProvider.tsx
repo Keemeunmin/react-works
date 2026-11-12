@@ -1,63 +1,90 @@
 
-import React, { useState } from 'react';
-import type { CartItem } from '../types/cart';
+import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
+import type { Product } from '../types/product';
 import { CartContext } from './CartContext';
-import { useProduct } from './ProductContext';
+import type { CartItem } from './CartContext';
 
-const CartProvider = ({ children }: { children: React.ReactNode }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const { products } = useProduct();
+interface Props {
+  children: ReactNode;
+}
+
+export default function CartProvider({ children }: Props) {
+
+  // 저장된 장바구니 불러오기
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const savedCart = localStorage.getItem('cartItems');
+
+      if (savedCart) {
+        const parsed = JSON.parse(savedCart);
+        return Array.isArray(parsed) ? parsed : [];
+      }
+    } catch (error) {
+      console.error('장바구니 불러오기 실패:', error);
+    }
+
+    return [];
+  });
+
+  // 장바구니가 변경될 때마다 저장
+  useEffect(() => {
+    localStorage.setItem(
+      'cartItems',
+      JSON.stringify(cartItems)
+    );
+  }, [cartItems]);
 
   // 장바구니에 상품 추가
-  const addToCart = (productId: number, qty: number) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (item) => item.productId === productId
+  const addToCart = (product: Product) => {
+    setCartItems((prev) => {
+      const existing = prev.find(
+        (item) => item.product.id === product.id
       );
 
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.productId === productId
-            ? { ...item, qty: item.qty + qty }
+      if (existing) {
+        return prev.map((item) =>
+          item.product.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
             : item
         );
-      } else {
-        return [...prevItems, { productId, qty }];
       }
+
+      return [...prev, { product, quantity: 1 }];
     });
   };
 
-  // 장바구니 수량 변경
-  const updateQuantity = (productId: number, qty: number) => {
-    if (qty < 1) return;
-
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.productId === productId ? { ...item, qty } : item
+  // 수량 증가
+  const increaseQuantity = (id: number) => {
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.product.id === id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
       )
     );
   };
 
-  // 장바구니 상품 삭제
-  const removeFromCart = (productId: number) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item.productId !== productId)
+  // 수량 감소
+  const decreaseQuantity = (id: number) => {
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.product.id === id
+          ? {
+              ...item,
+              quantity: Math.max(1, item.quantity - 1),
+            }
+          : item
+      )
     );
   };
 
-  // 총 수량 계산
-  const totalQuantity = cartItems.reduce(
-    (sum, item) => sum + item.qty, 0
-  );
-
-  // 총 가격 계산
-  const totalPrice = cartItems.reduce((sum, item) => {
-    const product = products.find(
-      (p) => p.id === item.productId
+  // 상품 삭제
+  const removeFromCart = (id: number) => {
+    setCartItems((prev) =>
+      prev.filter((item) => item.product.id !== id)
     );
-
-    return sum + (product ? product.price * item.qty : 0);
-  }, 0);
+  };
 
   // 장바구니 전체 비우기
   const clearCart = () => {
@@ -65,18 +92,17 @@ const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <CartContext.Provider value={{
-      cartItems,
-      addToCart,
-      updateQuantity,
-      removeFromCart,
-      totalQuantity,
-      totalPrice,
-      clearCart
-    }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        increaseQuantity,
+        decreaseQuantity,
+        clearCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
-};
-
-export default CartProvider;
+}

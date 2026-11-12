@@ -1,89 +1,71 @@
 
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 
-interface SignInForm {
-  username: string;
-  password: string;
-}
-
-const initialForm: SignInForm = {
-  username: '',
-  password: '',
-};
-
-const SignIn = () => {
-  const { signIn } = useUser();
+export default function SignIn() {
   const navigate = useNavigate();
+  const { login } = useUser();
 
-  const [form, setForm] = useState<SignInForm>(initialForm);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const { username, password } = form;
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
 
-    if (!username.trim() || !password) {
-      setError('아이디와 비밀번호를 입력하세요.');
-      return;
+    try {
+      await login(username, password);
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      setError('아이디 또는 비밀번호를 확인해 주세요.');
+    } finally {
+      setLoading(false);
     }
-
-    if (!signIn(username.trim(), password)) {
-      setError('아이디 또는 비밀번호가 올바르지 않습니다.');
-      return;
-    }
-
-    navigate('/');
   };
 
   return (
-    <div className="sign-in">
+    <div>
       <h2>로그인</h2>
 
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="username">아이디</label>
           <input
-            type="text"
             id="username"
-            name="username"
+            type="text"
             value={username}
-            onChange={handleInputChange}
-            placeholder="아이디를 입력하세요"
-            autoComplete="username"
+            onChange={(e) => setUsername(e.target.value)}
+            required
           />
         </div>
 
         <div>
           <label htmlFor="password">비밀번호</label>
           <input
-            type="password"
             id="password"
-            name="password"
+            type="password"
             value={password}
-            onChange={handleInputChange}
-            placeholder="비밀번호를 입력하세요"
-            autoComplete="current-password"
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </div>
 
-        {error && <p className="sign-in_error">{error}</p>}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
 
-        <button type="submit">로그인</button>
+        <button type="submit" disabled={loading}>
+          {loading ? '로그인 중...' : '로그인'}
+        </button>
       </form>
 
-      <p className="signup-link">
-        아직 계정이 없으신가요? <Link to="/signup">회원가입</Link>
+      <p>
+        계정이 없으신가요? <Link to="/signup">회원가입</Link>
       </p>
     </div>
   );
-};
-
-export default SignIn;
+}

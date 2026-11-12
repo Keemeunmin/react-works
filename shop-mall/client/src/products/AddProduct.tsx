@@ -1,106 +1,78 @@
 
-import type { Category } from "../types/product";
-import { useProduct } from "../context/ProductContext";
-import { useState } from "react";
-import type { ChangeEvent, FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-
-// 상품 등록 폼 데이터 타입
-interface ProductForm {
-  pName: string;
-  category: Category;
-  price: string;
-  description: string;
-}
-
-// 초기 폼 데이터
-const initialForm: ProductForm = {
-  pName: "",
-  category: "마우스",
-  price: "",
-  description: "",
-};
+import { useState, type FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useProducts } from '../context/ProductContext';
+import type { Category } from '../types/product';
 
 const AddProduct = () => {
-  const { addProduct } = useProduct();
-
-  const [form, setForm] = useState<ProductForm>(initialForm);
-  const [error, setError] = useState<string | null>(null);
-
-  const { pName, category, price, description } = form;
   const navigate = useNavigate();
+  const { addProduct } = useProducts();
 
-  // 입력값 변경
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
+  const [pName, setPName] = useState('');
+  const [category, setCategory] = useState<Category>('마우스');
+  const [price, setPrice] = useState('');
+  const [description, setDescription] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [error, setError] = useState('');
 
-    setForm({
-      ...form,
-      [name]: value,
-    });
-  };
-
-  // 상품 등록
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError('');
+
+    const priceNumber = Number(price);
 
     if (!pName.trim()) {
-      setError("상품명을 입력해주세요.");
+      setError('상품명을 입력하세요.');
       return;
     }
 
-    if (!price || !Number.isInteger(Number(price)) || Number(price) <= 0) {
-      setError("가격을 올바르게 입력해주세요.");
+    if (
+      !price ||
+      !Number.isInteger(priceNumber) ||
+      priceNumber <= 0
+    ) {
+      setError('가격은 1원 이상의 정수로 입력하세요.');
       return;
     }
 
-    if (!description.trim()) {
-      setError("설명을 입력해주세요.");
-      return;
+    try {
+      await addProduct({
+        pName: pName.trim(),
+        category,
+        price: priceNumber,
+        description: description.trim(),
+        imageUrl: imageUrl.trim() || null,
+      });
+
+      alert('상품 등록 성공!');
+      navigate('/');
+    } catch (err) {
+      console.log(err);
+      setError('상품 등록 중 오류가 발생했습니다.');
     }
-
-    addProduct({
-      pName,
-      category,
-      price: Number(price),
-      description,
-    });
-
-    alert("상품이 등록되었습니다.");
-    navigate("/");
-  };
-
-  // 입력값 초기화
-  const handleCancel = () => {
-    setForm(initialForm);
-    setError(null);
   };
 
   return (
-    <div className="product-add">
+    <div className="add-product">
       <h2>상품 등록</h2>
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="pName">상품명:</label>
+          <label>상품명</label>
           <input
             type="text"
-            id="pName"
-            name="pName"
             value={pName}
-            onChange={handleChange}
+            onChange={(e) => setPName(e.target.value)}
           />
         </div>
 
         <div>
-          <label htmlFor="category">카테고리:</label>
+          <label>카테고리</label>
           <select
-            id="category"
-            name="category"
             value={category}
-            onChange={handleChange}
+            onChange={(e) =>
+              setCategory(e.target.value as Category)
+            }
           >
             <option value="마우스">마우스</option>
             <option value="키보드">키보드</option>
@@ -110,34 +82,44 @@ const AddProduct = () => {
         </div>
 
         <div>
-          <label htmlFor="price">가격:</label>
+          <label>가격</label>
           <input
             type="number"
-            id="price"
-            name="price"
             value={price}
-            onChange={handleChange}
+            onChange={(e) => setPrice(e.target.value)}
           />
         </div>
 
         <div>
-          <label htmlFor="description">설명:</label>
+          <label>상품 설명</label>
           <textarea
-            id="description"
-            name="description"
             value={description}
-            onChange={handleChange}
+            onChange={(e) => setDescription(e.target.value)}
           />
         </div>
 
-        {error && <p className="product-add_error">{error}</p>}
-
-        <div className="product-add_buttons">
-          <button type="submit">등록</button>
-          <button type="button" onClick={handleCancel}>
-            취소
-          </button>
+        <div>
+          <label>이미지 경로</label>
+          <input
+            type="text"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="/images/mouse.jpg"
+          />
         </div>
+
+        {error && (
+          <p style={{ color: 'red' }}>{error}</p>
+        )}
+
+        <button type="submit">상품 등록</button>
+
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+        >
+          취소
+        </button>
       </form>
     </div>
   );

@@ -1,62 +1,115 @@
 
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
+import type { ReactNode } from 'react';
+
+import {
+  loginUser,
+  registerUser,
+  updateUser,
+} from '../api/users';
+
 import { UserContext } from './UserContext';
-import { initialUsers } from '../datas/users';
-import type { NewUser, User } from '../types/user';
 
-const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [users, setUsers] = useState<User[]>(initialUsers);
+import type {
+  User,
+  NewUser,
+  UpdateUser,
+} from './UserContext';
 
-  // 로그인한 회원의 id만 저장
-  const [currentUserId, setCurrentUserId] =
-    useState<number | null>(null);
+interface Props {
+  children: ReactNode;
+}
+
+export default function UserProvider({ children }: Props) {
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const savedUser = localStorage.getItem('loginUser');
+
+      if (!savedUser) {
+        return null;
+      }
+
+      const parsedUser = JSON.parse(savedUser);
+
+      // 이전에 잘못 저장된 로그인 데이터 방지
+      if (
+        typeof parsedUser.id !== 'number' ||
+        typeof parsedUser.username !== 'string'
+      ) {
+        localStorage.removeItem('loginUser');
+        return null;
+      }
+
+      return parsedUser as User;
+    } catch {
+      localStorage.removeItem('loginUser');
+      return null;
+    }
+  });
 
   // 로그인
-  const signIn = (username: string, password: string) => {
-    const user = users.find(
-      (u) => u.username === username && u.password === password
+  const login = async (
+    username: string,
+    password: string
+  ): Promise<void> => {
+    const loggedInUser = await loginUser(
+      username,
+      password
     );
 
-    if (!user) return false;
+    setUser(loggedInUser);
 
-    setCurrentUserId(user.id);
-    return true;
-  };
-
-  // 로그아웃
-  const signOut = () => {
-    setCurrentUserId(null);
+    localStorage.setItem(
+      'loginUser',
+      JSON.stringify(loggedInUser)
+    );
   };
 
   // 회원가입
-  const signUp = (user: Omit<NewUser, 'role'>) => {
-    if (users.some((u) => u.username === user.username)) {
-      return false;
-    }
-
-    setUsers((prev) => {
-      const nextId = Math.max(0, ...prev.map((u) => u.id)) + 1;
-
-      return [
-        ...prev,
-        { ...user, id: nextId, role: 'user' }
-      ];
-    });
-
-    return true;
+  const signup = async (
+    newUser: NewUser
+  ): Promise<void> => {
+    await registerUser(newUser);
   };
 
-  // 로그인한 회원 정보 찾기
-  const currentUser =
-    users.find((u) => u.id === currentUserId) ?? null;
+  // 로그아웃
+  const logout = (): void => {
+    setUser(null);
+    localStorage.removeItem('loginUser');
+  };
+
+  // 회원정보 변경
+  const updateProfile = async (
+    data: UpdateUser
+  ): Promise<void> => {
+    if (!user) {
+      throw new Error('로그인이 필요합니다.');
+    }
+
+    const updatedUser = await updateUser(
+      user.id,
+      data
+    );
+
+    setUser(updatedUser);
+
+    localStorage.setItem(
+      'loginUser',
+      JSON.stringify(updatedUser)
+    );
+  };
 
   return (
     <UserContext.Provider
-      value={{ currentUser, signIn, signOut, signUp }}
+      value={{
+        user,
+        login,
+        signup,
+        logout,
+        updateProfile,
+      }}
     >
       {children}
     </UserContext.Provider>
   );
-};
-
-export default UserProvider;
+}

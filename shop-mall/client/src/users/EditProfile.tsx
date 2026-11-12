@@ -25,10 +25,14 @@ export default function EditProfile() {
     setLoading(true);
 
     try {
-      await updateProfile({ name, email });
+      await updateProfile({
+        name,
+        email,
+      });
+
       setMessage('회원정보가 변경되었습니다.');
     } catch (err) {
-      console.error(err);
+      console.error('회원정보 변경 오류:', err);
       setError('회원정보 변경에 실패했습니다.');
     } finally {
       setLoading(false);
@@ -72,17 +76,24 @@ export default function EditProfile() {
           />
         </div>
 
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        {message && <p>{message}</p>}
+        {error && (
+          <p style={{ color: 'red' }}>{error}</p>
+        )}
+
+        {message && (
+          <p>{message}</p>
+        )}
 
         <button type="submit" disabled={loading}>
           {loading ? '저장 중...' : '변경사항 저장'}
         </button>
       </form>
 
-      <p>
-        <Link to="/">홈으로 돌아가기</Link>
-      </p>
+      <hr />
+
+      <Link to="/mypage">
+        마이페이지로 돌아가기
+      </Link>
     </div>
   );
 }
